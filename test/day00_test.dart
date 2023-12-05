@@ -1,9 +1,9 @@
 import 'package:test/test.dart';
 
 import 'package:app/file.dart';
-import 'package:app/day01/solution.dart';
+import 'package:app/day00/solution.dart';
 
-final day = 1;
+final day = 0;
 
 void main() {
   group('part 1', () {
@@ -11,7 +11,7 @@ void main() {
       final lines = await readInputFile(day, 'test1');
       final result = Solution(lines).solvePart1();
 
-      expect(result, equals(142));
+      expect(result, equals(0));
     });
   });
 
@@ -20,18 +20,8 @@ void main() {
       final lines = await readInputFile(day, 'test2');
       final result = Solution(lines).solvePart2();
 
-      expect(result, equals(281));
+      expect(result, equals(0));
     });
-
-    for (var testData in [
-      (inputLine: '39eightwo', expectedResult: 32),
-    ]) {
-      test('should find right solution for "${testData.inputLine}" line', () async {
-        final result = Solution([testData.inputLine]).solvePart2();
-
-        expect(result, equals(testData.expectedResult));
-      });
-    }
   });    
 
   test('should find right input solutions for part 1 & 2', () async {
@@ -40,9 +30,9 @@ void main() {
     final solution = Solution(lines);
 
     final result1 = solution.solvePart1();
-    expect(result1, equals(54159));
+    expect(result1, equals(0));
 
     final result2 = solution.solvePart2();
-    expect(result2, equals(53866));
+    expect(result2, equals(0));
   });
 }

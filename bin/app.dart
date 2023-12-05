@@ -1,9 +1,14 @@
 import 'dart:io';
+import 'dart:mirrors';
 
 import 'package:args/args.dart';
+import 'package:collection/collection.dart';
 
 import 'package:app/file.dart';
-import 'package:app/day01/solution.dart' as day01;
+
+// Importing solutions (TODO: import dynamically at runtime ???)
+import 'package:app/day01/solution.dart' as day01; // ignore: unused_import
+import 'package:app/day02/solution.dart' as day02; // ignore: unused_import
 
 void main(List<String> arguments) async {
   exitCode = 0; // Presume success
@@ -33,16 +38,21 @@ Future<void> solveDay(int day, {int? part, String? inputFilename}) async {
   // Reading input...
   final lines = await readInputFile(day, inputFilename ?? 'input');
 
-  // Solving...
-  final solution = day01.Solution(lines);
+  // Finding current day solution class to use
+  final solutionPath = 'package:app/day${day.toString().padLeft(2, '0')}/solution.dart';
+  final solutionLibrary= currentMirrorSystem().libraries.values.firstWhere((l) => l.uri.toString() == solutionPath);
+  final solutionClass = solutionLibrary.declarations.values.firstWhere((d) => d.simpleName == Symbol('Solution')) as ClassMirror;
+
+  // Solving...  
+  final solutionInstance = solutionClass.newInstance(Symbol(''), [lines]);
 
   if (part == null || part == 1) {
-    final result = solution.solvePart1();
+    final result = solutionInstance.invoke(Symbol('solvePart1'), []).reflectee;
     stdout.writeln('Solution 1: $result');
   }
 
   if (part == null || part == 2) {
-    final result = solution.solvePart2();
+    final result = solutionInstance.invoke(Symbol('solvePart2'), []).reflectee;
     stdout.writeln('Solution 2: $result');
   }
 

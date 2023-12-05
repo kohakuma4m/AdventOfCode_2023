@@ -21,7 +21,7 @@ class Solution {
   }
 
   ///////////////////////////////////////
-  // Static methods
+  /// Static methods
   ///////////////////////////////////////
 
   static final RegExp nonDigitCharacter = RegExp(r'[^0-9]+');
