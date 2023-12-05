@@ -1,9 +1,9 @@
 import 'package:test/test.dart';
 
 import 'package:app/file.dart';
-import 'package:app/day00/solution.dart';
+import 'package:app/day03/solution.dart';
 
-final day = 0;
+final day = 3;
 
 void main() {
   group('part 1', () {
@@ -11,7 +11,7 @@ void main() {
       final lines = await readInputFile(day, 'test');
       final result = Solution(lines).solvePart1();
 
-      expect(result, equals(0));
+      expect(result, equals(4361));
     });
   });
 
@@ -20,7 +20,7 @@ void main() {
       final lines = await readInputFile(day, 'test');
       final result = Solution(lines).solvePart2();
 
-      expect(result, equals(0));
+      expect(result, equals(467835));
     });
   });    
 
@@ -30,9 +30,9 @@ void main() {
     final solution = Solution(lines);
 
     final result1 = solution.solvePart1();
-    expect(result1, equals(0));
+    expect(result1, equals(514969));
 
     final result2 = solution.solvePart2();
-    expect(result2, equals(0));
+    expect(result2, equals(78915902));
   });
 }

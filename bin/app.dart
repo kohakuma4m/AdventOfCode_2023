@@ -9,6 +9,7 @@ import 'package:app/file.dart';
 // Importing solutions (TODO: import dynamically at runtime ???)
 import 'package:app/day01/solution.dart' as day01; // ignore: unused_import
 import 'package:app/day02/solution.dart' as day02; // ignore: unused_import
+import 'package:app/day03/solution.dart' as day02; // ignore: unused_import
 
 void main(List<String> arguments) async {
   exitCode = 0; // Presume success
@@ -27,7 +28,7 @@ void main(List<String> arguments) async {
   final args = argResults.rest;
 
   if (int.tryParse(day) == null) {
-    throw ArgParserException("Missing 'day' number value");
+    throw ArgParserException('Missing "day" number value');
   }
 
   await solveDay(int.parse(day),

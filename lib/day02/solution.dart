@@ -20,9 +20,9 @@ class Solution {
       });
     }).toList();
 
-    print("-------------------");
+    print('-------------------');
     printGamesData(validGames);
-    print("-------------------");
+    print('-------------------');
 
     return validGames.map((g) => g.number).sum;
   }
@@ -45,12 +45,12 @@ class Solution {
         }
       }
 
-      return bag.content.values.reduce((value, element) => value * element);
+      return bag.content.values.reduce((product, value) => product * value);
     }).toList();
 
-    print("-------------------");
+    print('-------------------');
     print(powers.toString());
-    print("-------------------");
+    print('-------------------');
 
     return powers.sum;
   }
