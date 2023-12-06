@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-Future<List<String>> readInputFile(int day, String inputFilename) async {
-  final solutionFolder = 'lib/day${day.toString().padLeft(2, '0')}';
+Future<List<String>> readInputFile(String day, String inputFilename) async {
+  final solutionFolder = 'lib/day$day';
 
   final fileStream = utf8.decoder
       .bind(File('$solutionFolder/$inputFilename.txt').openRead())

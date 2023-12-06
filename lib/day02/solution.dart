@@ -16,7 +16,8 @@ class Solution {
 
     final List<Game> validGames = games.where((game) {
       return game.rounds.every((round) {
-        return round.samples.every((sample) => sample.qty <= bag.content[sample.color]!);
+        return round.samples
+            .every((sample) => sample.qty <= bag.content[sample.color]!);
       });
     }).toList();
 
@@ -49,7 +50,7 @@ class Solution {
     }).toList();
 
     print('-------------------');
-    print(powers.toString());
+    print(powers);
     print('-------------------');
 
     return powers.sum;
@@ -72,7 +73,10 @@ class Solution {
         final Round currentRound = Round();
         for (final cube in cubes) {
           final [value, color] = cube.trim().split(' ');
-          currentRound.samples.add((color: (CubeColor.values.firstWhere((v) => v.name == color)), qty: int.parse(value)));
+          currentRound.samples.add((
+            color: (CubeColor.values.firstWhere((v) => v.name == color)),
+            qty: int.parse(value)
+          ));
         }
 
         currentGame.rounds.add(currentRound);

@@ -9,7 +9,8 @@ import 'package:app/file.dart';
 // Importing solutions (TODO: import dynamically at runtime ???)
 import 'package:app/day01/solution.dart' as day01; // ignore: unused_import
 import 'package:app/day02/solution.dart' as day02; // ignore: unused_import
-import 'package:app/day03/solution.dart' as day02; // ignore: unused_import
+import 'package:app/day03/solution.dart' as day03; // ignore: unused_import
+import 'package:app/day04/solution.dart' as day04; // ignore: unused_import
 
 void main(List<String> arguments) async {
   exitCode = 0; // Presume success
@@ -37,14 +38,19 @@ void main(List<String> arguments) async {
 
 Future<void> solveDay(int day, {int? part, String? inputFilename}) async {
   // Reading input...
-  final lines = await readInputFile(day, inputFilename ?? 'input');
+  final dayString = day.toString().padLeft(2, '0');
+  final lines = await readInputFile(dayString, inputFilename ?? 'input');
 
   // Finding current day solution class to use
-  final solutionPath = 'package:app/day${day.toString().padLeft(2, '0')}/solution.dart';
-  final solutionLibrary= currentMirrorSystem().libraries.values.firstWhere((l) => l.uri.toString() == solutionPath);
-  final solutionClass = solutionLibrary.declarations.values.firstWhere((d) => d.simpleName == Symbol('Solution')) as ClassMirror;
+  final solutionPath = 'package:app/day$dayString/solution.dart';
+  final solutionLibrary = currentMirrorSystem()
+      .libraries
+      .values
+      .firstWhere((l) => l.uri.toString() == solutionPath);
+  final solutionClass = solutionLibrary.declarations.values
+      .firstWhere((d) => d.simpleName == Symbol('Solution')) as ClassMirror;
 
-  // Solving...  
+  // Solving...
   final solutionInstance = solutionClass.newInstance(Symbol(''), [lines]);
 
   if (part == null || part == 1) {

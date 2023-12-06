@@ -3,12 +3,12 @@ import 'package:test/test.dart';
 import 'package:app/file.dart';
 import 'package:app/day00/solution.dart';
 
-final day = 0;
+final dayString = '00';
 
 void main() {
   group('part 1', () {
     test('should find right solution for example input', () async {
-      final lines = await readInputFile(day, 'test');
+      final lines = await readInputFile(dayString, 'test');
       final result = Solution(lines).solvePart1();
 
       expect(result, equals(0));
@@ -17,15 +17,15 @@ void main() {
 
   group('part 2', () {
     test('should find right solution for example input', () async {
-      final lines = await readInputFile(day, 'test');
+      final lines = await readInputFile(dayString, 'test');
       final result = Solution(lines).solvePart2();
 
       expect(result, equals(0));
     });
-  });    
+  });
 
   test('should find right input solutions for part 1 & 2', () async {
-    final lines = await readInputFile(day, 'input');
+    final lines = await readInputFile(dayString, 'input');
 
     final solution = Solution(lines);
 
