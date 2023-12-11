@@ -9,7 +9,7 @@ Advent of Code 2023 solutions (dart 3.2.2-1)
 
 # To run linter, format code, or run static code analysis, use
   - `dart fix [--dry-run|--apply]`
-  - `dart format .`
+  - `dart format --line-length=160 .`
   - `dart analyze`
 
 # To run solutions unit tests for all days or a specific day, use

@@ -14,9 +14,7 @@ class Solution {
 
       final match = pointsToCheck.firstWhereOrNull((point) {
         final character = schema.grid.coordinates[point];
-        return character != null &&
-            character != emptySymbol &&
-            int.tryParse(character) == null; // Character symbol
+        return character != null && character != emptySymbol && int.tryParse(character) == null; // Character symbol
       });
 
       return match != null;
@@ -36,9 +34,7 @@ class Solution {
           final Set<Part> adjacentParts = {};
           for (final point in pointsToCheck) {
             final character = schema.grid.coordinates[point];
-            if (character != null &&
-                character != emptySymbol &&
-                int.tryParse(character) != null) {
+            if (character != null && character != emptySymbol && int.tryParse(character) != null) {
               // Part number
               final part = schema.parts.firstWhere((part) {
                 final y = part.p1.y;
@@ -61,9 +57,7 @@ class Solution {
         .toList();
 
     return gears.map((gear) {
-      final gearRatio = gear.adjacentParts
-          .map((part) => part.number)
-          .reduce((product, value) => product * value);
+      final gearRatio = gear.adjacentParts.map((part) => part.number).reduce((product, value) => product * value);
 
       return gearRatio;
     }).sum;
@@ -88,11 +82,7 @@ class Solution {
 
         if (int.tryParse(element) != null) {
           // Part
-          parts.add((
-            p1: (x: x1, y: y),
-            p2: (x: x2, y: y),
-            number: int.parse(element)
-          ));
+          parts.add((p1: (x: x1, y: y), p2: (x: x2, y: y), number: int.parse(element)));
           for (var x = x1; x <= x2; x++) {
             grid.coordinates.addAll({(x: x, y: y): line[x]});
           }

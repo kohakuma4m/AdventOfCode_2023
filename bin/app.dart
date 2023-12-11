@@ -17,11 +17,7 @@ void main(List<String> arguments) async {
   exitCode = 0; // Presume success
 
   final parser = ArgParser()
-    ..addOption('day',
-        abbr: 'd',
-        mandatory: true,
-        allowed:
-            List<String>.generate(25, (i) => (i + 1).toString())) // [1, 25]
+    ..addOption('day', abbr: 'd', mandatory: true, allowed: List<String>.generate(25, (i) => (i + 1).toString())) // [1, 25]
     ..addOption('part', abbr: 'p', allowed: ['1', '2'], defaultsTo: '');
 
   ArgResults argResults = parser.parse(arguments);
@@ -33,8 +29,7 @@ void main(List<String> arguments) async {
     throw ArgParserException('Missing "day" number value');
   }
 
-  await solveDay(int.parse(day),
-      part: int.tryParse(part), inputFilename: args.firstOrNull);
+  await solveDay(int.parse(day), part: int.tryParse(part), inputFilename: args.firstOrNull);
 }
 
 Future<void> solveDay(int day, {int? part, String? inputFilename}) async {
@@ -44,12 +39,8 @@ Future<void> solveDay(int day, {int? part, String? inputFilename}) async {
 
   // Finding current day solution class to use
   final solutionPath = 'package:app/day$dayString/solution.dart';
-  final solutionLibrary = currentMirrorSystem()
-      .libraries
-      .values
-      .firstWhere((l) => l.uri.toString() == solutionPath);
-  final solutionClass = solutionLibrary.declarations.values
-      .firstWhere((d) => d.simpleName == Symbol('Solution')) as ClassMirror;
+  final solutionLibrary = currentMirrorSystem().libraries.values.firstWhere((l) => l.uri.toString() == solutionPath);
+  final solutionClass = solutionLibrary.declarations.values.firstWhere((d) => d.simpleName == Symbol('Solution')) as ClassMirror;
 
   // Solving...
   final solutionInstance = solutionClass.newInstance(Symbol(''), [lines]);

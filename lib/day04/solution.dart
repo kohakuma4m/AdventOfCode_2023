@@ -28,10 +28,7 @@ class Solution {
       }
     }
 
-    print(cardsMap.entries
-        .map((e) => [e.key.cardNumber, e.value])
-        .toList()
-        .join('\n'));
+    print(cardsMap.entries.map((e) => [e.key.cardNumber, e.value]).toList().join('\n'));
 
     return cardsMap.values.sum;
   }
@@ -48,16 +45,8 @@ class Solution {
       final cardNumber = int.parse(left.replaceAll('Card ', ''));
 
       [left, right] = right.split('|');
-      final winningNumbers = left
-          .split(' ')
-          .where((n) => n.isNotEmpty)
-          .map((n) => int.parse(n))
-          .toList();
-      final numbers = right
-          .split(' ')
-          .where((n) => n.isNotEmpty)
-          .map((n) => int.parse(n))
-          .toList();
+      final winningNumbers = left.split(' ').where((n) => n.isNotEmpty).map((n) => int.parse(n)).toList();
+      final numbers = right.split(' ').where((n) => n.isNotEmpty).map((n) => int.parse(n)).toList();
 
       cards.add(Card(cardNumber, winningNumbers, numbers));
     }
@@ -100,18 +89,14 @@ class Card {
 
   @override
   String toString() {
-    final winningNumbersString =
-        winningNumbers.map((n) => n.toString().padLeft(2)).join(', ');
-    final numbersString =
-        numbers.map((n) => n.toString().padLeft(2)).join(', ');
+    final winningNumbersString = winningNumbers.map((n) => n.toString().padLeft(2)).join(', ');
+    final numbersString = numbers.map((n) => n.toString().padLeft(2)).join(', ');
     return 'Card ${cardNumber.toString().padLeft(3)}: $winningNumbersString | $numbersString';
   }
 
   @override
   bool operator ==(Object other) {
-    return other is Card &&
-        other.runtimeType == runtimeType &&
-        other.cardNumber == cardNumber;
+    return other is Card && other.runtimeType == runtimeType && other.cardNumber == cardNumber;
   }
 
   @override
