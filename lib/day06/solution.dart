@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 
 class Solution {
-  List<String> lines = [];
+  List<String> lines;
 
   Solution(this.lines);
 

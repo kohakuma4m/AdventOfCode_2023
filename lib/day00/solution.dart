@@ -1,5 +1,5 @@
 class Solution {
-  List<String> lines = [];
+  List<String> lines;
 
   Solution(this.lines);
 
