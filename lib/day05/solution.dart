@@ -5,7 +5,7 @@ class Solution {
 
   Solution(this.lines);
 
-  int solvePart1() {
+  Future<int> solvePart1() async {
     final almanac = readAlmanac<SeedValue>(lines);
     printAlmanac(almanac);
     print('-------------------');
@@ -18,7 +18,7 @@ class Solution {
     return seedsMap.values.map((value) => value['location']!).min;
   }
 
-  int solvePart2() {
+  Future<int> solvePart2() async {
     final almanac = readAlmanac<SeedRange>(lines);
 
     final seedLocationsMap = getSeedLocationIntervalsMap(almanac);
@@ -267,7 +267,7 @@ class Solution {
           final (source: _, :seedInterval, :currentInterval) = interval;
           seedLocationsMap.addAll({(start: seedInterval.start, end: seedInterval.end): (start: currentInterval.start, end: currentInterval.end)});
         } else {
-          intervalsToMap.addAll([interval]);
+          intervalsToMap.add(interval);
         }
       }
     } while (intervalsToMap.isNotEmpty);

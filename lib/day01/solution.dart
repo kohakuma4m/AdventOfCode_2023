@@ -5,13 +5,13 @@ class Solution {
 
   Solution(this.lines);
 
-  int solvePart1() {
+  Future<int> solvePart1() async {
     final List<int> values = lines.map((line) => getLineValue(line)).toList();
 
     return values.sum;
   }
 
-  int solvePart2() {
+  Future<int> solvePart2() async {
     final List<int> values = lines.map((line) => replaceRelevantDigitWords(line)).map((line) => getLineValue(line)).toList();
 
     return values.sum;

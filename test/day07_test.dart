@@ -3,62 +3,64 @@ import 'package:test/test.dart';
 import 'package:app/file.dart';
 import 'package:app/day07/solution.dart';
 
-final dayString = '07';
-
 void main() {
+  late List<String> testLines;
+  late List<String> inputLines;
+
+  setUpAll(() async {
+    testLines = await readInputFile('07', 'test');
+    inputLines = await readInputFile('07', 'input');
+  });
+
   group('part 1', () {
     test('should find right solution for example input using non regex version', () async {
-      final lines = await readInputFile(dayString, 'test');
-      final result = Solution(lines, false).solvePart1();
+      final result = await Solution(testLines, false).solvePart1();
 
       expect(result, equals(6440));
     });
 
     test('should find right solution for example input using regex version', () async {
-      final lines = await readInputFile(dayString, 'test');
-      final result = Solution(lines, true).solvePart1();
+      final result = await Solution(testLines, true).solvePart1();
 
       expect(result, equals(6440));
+    });
+
+    test('should find right solution for input using non regex version', () async {
+      final result = await Solution(inputLines, false).solvePart1();
+
+      expect(result, equals(248105065));
+    });
+
+    test('should find right solution for input using regex version', () async {
+      final result = await Solution(inputLines, true).solvePart1();
+
+      expect(result, equals(248105065));
     });
   });
 
   group('part 2', () {
     test('should find right solution for example input using non regex version', () async {
-      final lines = await readInputFile(dayString, 'test');
-      final result = Solution(lines, false).solvePart2();
+      final result = await Solution(testLines, false).solvePart2();
 
       expect(result, equals(5905));
     });
 
     test('should find right solution for example input using regex version', () async {
-      final lines = await readInputFile(dayString, 'test');
-      final result = Solution(lines, true).solvePart2();
+      final result = await Solution(testLines, true).solvePart2();
 
       expect(result, equals(5905));
     });
-  });
 
-  test('should find right input solutions for part 1 & 2 using non regex version', () async {
-    final lines = await readInputFile(dayString, 'input');
+    test('should find right solution for input using non regex version', () async {
+      final result = await Solution(inputLines, true).solvePart2();
 
-    final solution = Solution(lines);
+      expect(result, equals(249515436));
+    });
 
-    final result1 = solution.solvePart1();
-    expect(result1, equals(248105065));
+    test('should find right solution for input using regex version', () async {
+      final result = await Solution(inputLines, true).solvePart2();
 
-    final result2 = solution.solvePart2();
-    expect(result2, equals(249515436));
-  });
-
-  test('should find right input solutions for part 1 & 2 using regex version', () async {
-    final lines = await readInputFile(dayString, 'input');
-
-    final solution = Solution(lines, true);
-
-    final result1 = solution.solvePart1();
-    expect(result1, equals(248105065));
-
-    final result2 = solution.solvePart2();
-    expect(result2, equals(249515436));
+      expect(result, equals(249515436));
+    });
   });
 }

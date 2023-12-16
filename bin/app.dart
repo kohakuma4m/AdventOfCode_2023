@@ -14,6 +14,7 @@ import 'package:app/day04/solution.dart' as day04; // ignore: unused_import
 import 'package:app/day05/solution.dart' as day05; // ignore: unused_import
 import 'package:app/day06/solution.dart' as day06; // ignore: unused_import
 import 'package:app/day07/solution.dart' as day07; // ignore: unused_import
+import 'package:app/day08/solution.dart' as day08; // ignore: unused_import
 
 void main(List<String> arguments) async {
   exitCode = 0; // Presume success
@@ -48,12 +49,12 @@ Future<void> solveDay(int day, {int? part, String? inputFilename}) async {
   final solutionInstance = solutionClass.newInstance(Symbol(''), [lines]);
 
   if (part == null || part == 1) {
-    final result = solutionInstance.invoke(Symbol('solvePart1'), []).reflectee;
+    final result = await solutionInstance.invoke(Symbol('solvePart1'), []).reflectee;
     stdout.writeln('Solution 1: $result');
   }
 
   if (part == null || part == 2) {
-    final result = solutionInstance.invoke(Symbol('solvePart2'), []).reflectee;
+    final result = await solutionInstance.invoke(Symbol('solvePart2'), []).reflectee;
     stdout.writeln('Solution 2: $result');
   }
 

@@ -3,46 +3,52 @@ import 'package:test/test.dart';
 import 'package:app/file.dart';
 import 'package:app/day01/solution.dart';
 
-final dayString = '01';
-
 void main() {
+  late List<String> testLines1;
+  late List<String> testLines2;
+  late List<String> inputLines;
+
+  setUpAll(() async {
+    testLines1 = await readInputFile('01', 'test1');
+    testLines2 = await readInputFile('01', 'test2');
+    inputLines = await readInputFile('01', 'input');
+  });
+
   group('part 1', () {
     test('should find right solution for example input', () async {
-      final lines = await readInputFile(dayString, 'test1');
-      final result = Solution(lines).solvePart1();
+      final result = await Solution(testLines1).solvePart1();
 
       expect(result, equals(142));
+    });
+
+    test('should find right solution for input', () async {
+      final result = await Solution(inputLines).solvePart1();
+
+      expect(result, equals(54159));
     });
   });
 
   group('part 2', () {
     test('should find right solution for example input', () async {
-      final lines = await readInputFile(dayString, 'test2');
-      final result = Solution(lines).solvePart2();
+      final result = await Solution(testLines2).solvePart2();
 
       expect(result, equals(281));
+    });
+
+    test('should find right solution for input', () async {
+      final result = await Solution(inputLines).solvePart2();
+
+      expect(result, equals(53866));
     });
 
     for (var testData in [
       (line: '39eightwo', expectedResult: 32),
     ]) {
       test('should find right solution for "${testData.line}" line', () async {
-        final result = Solution([testData.line]).solvePart2();
+        final result = await Solution([testData.line]).solvePart2();
 
         expect(result, equals(testData.expectedResult));
       });
     }
-  });
-
-  test('should find right input solutions for part 1 & 2', () async {
-    final lines = await readInputFile(dayString, 'input');
-
-    final solution = Solution(lines);
-
-    final result1 = solution.solvePart1();
-    expect(result1, equals(54159));
-
-    final result2 = solution.solvePart2();
-    expect(result2, equals(53866));
   });
 }

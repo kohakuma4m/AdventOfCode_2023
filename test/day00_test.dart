@@ -3,13 +3,24 @@ import 'package:test/test.dart';
 import 'package:app/file.dart';
 import 'package:app/day00/solution.dart';
 
-final dayString = '00';
-
 void main() {
+  late List<String> testLines;
+  late List<String> inputLines;
+
+  setUpAll(() async {
+    testLines = await readInputFile('00', 'test');
+    inputLines = await readInputFile('00', 'input');
+  });
+
   group('part 1', () {
     test('should find right solution for example input', () async {
-      final lines = await readInputFile(dayString, 'test');
-      final result = Solution(lines).solvePart1();
+      final result = await Solution(testLines).solvePart1();
+
+      expect(result, equals(0));
+    });
+
+    test('should find right solution for input', () async {
+      final result = await Solution(inputLines).solvePart1();
 
       expect(result, equals(0));
     });
@@ -17,22 +28,15 @@ void main() {
 
   group('part 2', () {
     test('should find right solution for example input', () async {
-      final lines = await readInputFile(dayString, 'test');
-      final result = Solution(lines).solvePart2();
+      final result = await Solution(testLines).solvePart2();
 
       expect(result, equals(0));
     });
-  });
 
-  test('should find right input solutions for part 1 & 2', () async {
-    final lines = await readInputFile(dayString, 'input');
+    test('should find right solution for input', () async {
+      final result = await Solution(inputLines).solvePart2();
 
-    final solution = Solution(lines);
-
-    final result1 = solution.solvePart1();
-    expect(result1, equals(0));
-
-    final result2 = solution.solvePart2();
-    expect(result2, equals(0));
+      expect(result, equals(0));
+    });
   });
 }

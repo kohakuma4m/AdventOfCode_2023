@@ -3,11 +3,11 @@ class Solution {
 
   Solution(this.lines);
 
-  int solvePart1() {
+  Future<int> solvePart1() async {
     return 0;
   }
 
-  int solvePart2() {
+  Future<int> solvePart2() async {
     return 0;
   }
 

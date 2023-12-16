@@ -7,14 +7,14 @@ class Solution {
 
   Solution(this.lines);
 
-  int solvePart1() {
+  Future<int> solvePart1() async {
     final cards = readCards(lines);
     printCards(cards);
 
     return cards.map((c) => c.points).sum;
   }
 
-  int solvePart2() {
+  Future<int> solvePart2() async {
     final cards = readCards(lines);
     final cardsMap = {for (final card in cards) card: 1};
 

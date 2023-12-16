@@ -5,7 +5,7 @@ class Solution {
 
   Solution(this.lines);
 
-  int solvePart1() {
+  Future<int> solvePart1() async {
     final schema = readSchematic(lines);
     schema.grid.display();
 
@@ -23,7 +23,7 @@ class Solution {
     return validParts.map((part) => part.number).sum;
   }
 
-  int solvePart2() {
+  Future<int> solvePart2() async {
     final schema = readSchematic(lines);
 
     final List<Gear> gears = schema.symbols

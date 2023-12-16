@@ -5,20 +5,20 @@ class Solution {
 
   Solution(this.lines);
 
-  int solvePart1() {
+  Future<int> solvePart1() async {
     final races = readRaceData(lines);
     final racesWinningStrategies = races.map(getRaceWinningStrategies).toList();
     printRaceStrategies(races, racesWinningStrategies);
 
-    return racesWinningStrategies.fold(1, (total, winningStrategies) => total * winningStrategies.length);
+    return racesWinningStrategies.fold<int>(1, (total, winningStrategies) => total * winningStrategies.length);
   }
 
-  int solvePart2() {
+  Future<int> solvePart2() async {
     final races = readRaceData(lines, singleRaceData: true);
     final racesWinningStrategies = races.map(getRaceWinningStrategies).toList();
     printRaceStrategies(races, racesWinningStrategies, printAllStrategies: false, printOptimalStrategy: false);
 
-    return racesWinningStrategies.fold(1, (total, winningStrategies) => total * winningStrategies.length);
+    return racesWinningStrategies.fold<int>(1, (total, winningStrategies) => total * winningStrategies.length);
   }
 
   ///////////////////////////////////////

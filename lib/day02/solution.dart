@@ -5,7 +5,7 @@ class Solution {
 
   Solution(this.lines);
 
-  int solvePart1() {
+  Future<int> solvePart1() async {
     final games = readGamesData(lines);
 
     final bag = Bag({
@@ -27,7 +27,7 @@ class Solution {
     return validGames.map((g) => g.number).sum;
   }
 
-  int solvePart2() {
+  Future<int> solvePart2() async {
     final games = readGamesData(lines);
 
     final List<int> powers = games.map((game) {

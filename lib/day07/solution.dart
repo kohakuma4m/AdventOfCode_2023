@@ -7,11 +7,11 @@ class Solution {
 
   Solution(this.lines, [this.useRegexVersion = false]);
 
-  int solvePart1() {
+  Future<int> solvePart1() async {
     return solve(false);
   }
 
-  int solvePart2() {
+  Future<int> solvePart2() async {
     return solve(true);
   }
 
@@ -38,7 +38,7 @@ class Solution {
 
     for (final line in lines) {
       final [hand, bid] = line.split(' ');
-      map.addAll({ hand: int.parse(bid) });
+      map.addAll({hand: int.parse(bid)});
     }
 
     return map;
@@ -79,7 +79,7 @@ class Solution {
   }
 
   static CamelCardHandType getCamelCardHandType(Hand hand, {bool jokerRule = false, bool useRegexVersion = false}) {
-    return useRegexVersion ? getCamelCardHandTypeWithRegex(hand, jokerRule: jokerRule) : getCamelCardHandTypeWithoutRegex(hand, jokerRule : jokerRule);
+    return useRegexVersion ? getCamelCardHandTypeWithRegex(hand, jokerRule: jokerRule) : getCamelCardHandTypeWithoutRegex(hand, jokerRule: jokerRule);
   }
 }
 
@@ -91,6 +91,7 @@ typedef Hand = String;
 typedef Bid = int;
 
 enum CamelCardHandType { fiveOfAKind, fourOfAKind, fullHouse, threeOfAKind, twoPair, onePair, highCard }
+
 const camelCardValues = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const camelCardJoker = 'J';
 const camelCardRuleValuesWithJoker = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', camelCardJoker];
@@ -127,12 +128,14 @@ CamelCardHandType getCamelCardHandTypeWithRegex(Hand hand, {bool jokerRule = fal
     // [4, 1]
     switch (nbJokers) {
       case 4:
-      case 1: {
-        return CamelCardHandType.fiveOfAKind;
-      }
-      case 0: {
-        return CamelCardHandType.fourOfAKind;
-      }
+      case 1:
+        {
+          return CamelCardHandType.fiveOfAKind;
+        }
+      case 0:
+        {
+          return CamelCardHandType.fourOfAKind;
+        }
     }
   }
 
@@ -140,12 +143,14 @@ CamelCardHandType getCamelCardHandTypeWithRegex(Hand hand, {bool jokerRule = fal
     // [3, 2]
     switch (nbJokers) {
       case 3:
-      case 2: {
-        return CamelCardHandType.fiveOfAKind;
-      }
-      case 0: {
-        return CamelCardHandType.fullHouse;
-      }
+      case 2:
+        {
+          return CamelCardHandType.fiveOfAKind;
+        }
+      case 0:
+        {
+          return CamelCardHandType.fullHouse;
+        }
     }
   }
 
@@ -153,27 +158,32 @@ CamelCardHandType getCamelCardHandTypeWithRegex(Hand hand, {bool jokerRule = fal
     // [3, 1, 1]
     switch (nbJokers) {
       case 3:
-      case 1: {
-        return CamelCardHandType.fourOfAKind;
-      }
-      case 0: {
-        return CamelCardHandType.threeOfAKind;
-      }
+      case 1:
+        {
+          return CamelCardHandType.fourOfAKind;
+        }
+      case 0:
+        {
+          return CamelCardHandType.threeOfAKind;
+        }
     }
   }
 
   if (match?.namedGroup('two_pair') != null) {
     // [2, 2, 1]
     switch (nbJokers) {
-      case 2: {
-        return CamelCardHandType.fourOfAKind;
-      }
-      case 1: {
-        return CamelCardHandType.fullHouse;
-      }
-      case 0: {
-        return CamelCardHandType.twoPair;
-      }
+      case 2:
+        {
+          return CamelCardHandType.fourOfAKind;
+        }
+      case 1:
+        {
+          return CamelCardHandType.fullHouse;
+        }
+      case 0:
+        {
+          return CamelCardHandType.twoPair;
+        }
     }
   }
 
@@ -181,26 +191,31 @@ CamelCardHandType getCamelCardHandTypeWithRegex(Hand hand, {bool jokerRule = fal
     // [2, 1, 1, 1]
     switch (nbJokers) {
       case 2:
-      case 1: {
-        return CamelCardHandType.threeOfAKind;
-      }
-      case 0: {
-        return CamelCardHandType.onePair;
-      }
+      case 1:
+        {
+          return CamelCardHandType.threeOfAKind;
+        }
+      case 0:
+        {
+          return CamelCardHandType.onePair;
+        }
     }
   }
 
   // [1, 1, 1, 1, 1]
   switch (nbJokers) {
-    case 1: {
-      return CamelCardHandType.onePair;
-    }
-    case 0: {
-      return CamelCardHandType.highCard;
-    }
-    default: {
-      throw 'Missing uncovered case ! $hand (#J = $nbJokers)';
-    }
+    case 1:
+      {
+        return CamelCardHandType.onePair;
+      }
+    case 0:
+      {
+        return CamelCardHandType.highCard;
+      }
+    default:
+      {
+        throw 'Missing uncovered case ! $hand (#J = $nbJokers)';
+      }
   }
 }
 
@@ -220,36 +235,44 @@ CamelCardHandType getCamelCardHandTypeWithoutRegex(Hand hand, {bool jokerRule = 
     case [2, 3]:
     case [3, 2]:
     case [4, 1]:
-    case [5]: {
-      return CamelCardHandType.fiveOfAKind;
-    }
+    case [5]:
+      {
+        return CamelCardHandType.fiveOfAKind;
+      }
     case [0, 4, 1]:
     case [1, 3, 1]:
     case [2, 2, 1]:
-    case [3, 1, 1]: {
-      return CamelCardHandType.fourOfAKind;
-    }
+    case [3, 1, 1]:
+      {
+        return CamelCardHandType.fourOfAKind;
+      }
     case [0, 3, 2]:
-    case [1, 2, 2]: {
-      return CamelCardHandType.fullHouse;
-    }
+    case [1, 2, 2]:
+      {
+        return CamelCardHandType.fullHouse;
+      }
     case [0, 3, 1, 1]:
     case [1, 2, 1, 1]:
-    case [2, 1, 1, 1]: {
-      return CamelCardHandType.threeOfAKind;
-    }
-    case [0, 2, 2, 1]: {
-      return CamelCardHandType.twoPair;
-    }
+    case [2, 1, 1, 1]:
+      {
+        return CamelCardHandType.threeOfAKind;
+      }
+    case [0, 2, 2, 1]:
+      {
+        return CamelCardHandType.twoPair;
+      }
     case [0, 2, 1, 1, 1]:
-    case [1, 1, 1, 1, 1]: {
-      return CamelCardHandType.onePair;
-    }
-    case [0, 1, 1, 1, 1, 1]: {
-      return CamelCardHandType.highCard;
-    }
-    default: {
-      throw 'Missing uncovered case ! $hand (#J = $nbJokers)';
-    }
+    case [1, 1, 1, 1, 1]:
+      {
+        return CamelCardHandType.onePair;
+      }
+    case [0, 1, 1, 1, 1, 1]:
+      {
+        return CamelCardHandType.highCard;
+      }
+    default:
+      {
+        throw 'Missing uncovered case ! $hand (#J = $nbJokers)';
+      }
   }
 }

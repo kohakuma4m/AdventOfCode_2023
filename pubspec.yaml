@@ -10,6 +10,8 @@ environment:
 dependencies:
   args: ^2.4.2
   collection: ^1.18.0
+  dart_numerics: ^0.0.6
+  qbcps_flutter: ^1.0.0
   # path: ^1.8.0
 
 dev_dependencies:
