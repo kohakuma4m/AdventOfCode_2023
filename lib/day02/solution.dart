@@ -48,7 +48,6 @@ class Solution {
       return bag.content.values.reduce((product, value) => product * value);
     }).toList();
 
-    print('-------------------');
     print(powers);
     print('-------------------');
 

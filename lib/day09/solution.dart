@@ -9,10 +9,10 @@ class Solution {
     final data = readData(lines);
 
     final nextHistoryValues = data
-      .map((values) => generateSequencesFromHistory(values))
-      .map((sequences) => sequences.map((s) => s.last).toList())
-      .map((lastSequenceValues) => lastSequenceValues.reversed.reduce((value, previous) => value + previous))
-      .toList();
+        .map((values) => generateSequencesFromHistory(values))
+        .map((sequences) => sequences.map((s) => s.last).toList())
+        .map((lastSequenceValues) => lastSequenceValues.reversed.reduce((value, previous) => value + previous))
+        .toList();
 
     print('Next values: $nextHistoryValues');
     print('-------------------');
@@ -24,10 +24,10 @@ class Solution {
     final data = readData(lines);
 
     final previousHistoryValues = data
-      .map((values) => generateSequencesFromHistory(values))
-      .map((sequences) => sequences.map((s) => s.first).toList())
-      .map((firstSequenceValues) => firstSequenceValues.reversed.reduce((value, previous) => previous - value))
-      .toList();
+        .map((values) => generateSequencesFromHistory(values))
+        .map((sequences) => sequences.map((s) => s.first).toList())
+        .map((firstSequenceValues) => firstSequenceValues.reversed.reduce((value, previous) => previous - value))
+        .toList();
 
     print('Previous values: $previousHistoryValues');
     print('-------------------');
