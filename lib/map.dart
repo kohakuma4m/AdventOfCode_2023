@@ -1,4 +1,18 @@
+import 'package:ansicolor/ansicolor.dart';
 import 'package:collection/collection.dart';
+
+/// Number extensions
+extension NumRange on num {
+  /// Check is number is within inclusive interval [min, max]
+  bool isBetweenInclusive(num min, num max) {
+    return min <= this && this <= max;
+  }
+
+  /// Check is number is within exclusive interval ]min, max[
+  bool isBetweenExclusive(num min, num max) {
+    return min < this && this < max;
+  }
+}
 
 /// 2D point
 class Point implements Comparable<Point> {
@@ -86,6 +100,12 @@ class Point implements Comparable<Point> {
   Point operator /(int value) {
     return Point((x / value).floor(), (y / value).floor());
   }
+}
+
+/// Get Manhathan distance between 2 points
+int calculateDistanceBetweenPoints(Point p1, Point p2) {
+  final difference = p2 - p1;
+  return difference.x.abs() + difference.y.abs();
 }
 
 /// 2D Directions
@@ -187,7 +207,13 @@ class MapGrid {
   }
 
   /// Print map (should only be used with a Map of single character symbols)
-  void display({bool showBorder = true, String emptySymbol = '.', String borderXSymbol = '-', String borderYSymbol = '|'}) {
+  void display(
+      {bool showBorder = true,
+      String emptySymbol = '.',
+      String borderXSymbol = '-',
+      String borderYSymbol = '|',
+      Map<String, AnsiPen> symbolsColorsMap = const {},
+      Map<Point, AnsiPen> coordinatesColorsMap = const {}}) {
     final separatorLine = showBorder ? borderXSymbol * (width + 2) : null;
 
     if (showBorder) {
@@ -198,7 +224,14 @@ class MapGrid {
       var line = '';
 
       for (var x = 0; x < width; x++) {
-        line += grid[Point(x, y)]?.toString() ?? emptySymbol;
+        final symbol = grid[Point(x, y)]?.toString() ?? emptySymbol;
+        if (coordinatesColorsMap.containsKey(Point(x, y))) {
+          line += coordinatesColorsMap[Point(x, y)]!(symbol);
+        } else if (symbolsColorsMap.containsKey(symbol)) {
+          line += symbolsColorsMap[symbol]!(symbol);
+        } else {
+          line += symbol;
+        }
       }
 
       print(showBorder ? '|$line|' : line);
@@ -244,12 +277,12 @@ class MapGrid {
         .toList();
   }
 
-  /// Get all inner and outer regions for empty space
+  /// Find all inner and outer regions for empty space
   ///
   /// Parameters:
   /// emptySymbols (optional): list of symbols considered empty in addition to unmapped coordinates
   /// emptyCoordinates (optional): list of coordinates to validate (instead of all coordinates for empty symbols)
-  (List<Region>, List<Region>) getEmptyRegions({Set<String> emptySymbols = const {}, Set<Point>? emptyCoordinates}) {
+  (List<Region>, List<Region>) findEmptyRegions({Set<String> emptySymbols = const {}, Set<Point>? emptyCoordinates}) {
     final unmappedTiles = findSymbolCoordinates('', includeEmptyCoordinates: true);
     final emptyTiles = emptySymbols.map((symbol) => findSymbolCoordinates(symbol)).flattened.toSet();
     emptyTiles.addAll(unmappedTiles);

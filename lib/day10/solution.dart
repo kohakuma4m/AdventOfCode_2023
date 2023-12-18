@@ -1,5 +1,7 @@
-import 'package:app/map.dart';
+import 'package:ansicolor/ansicolor.dart';
 import 'package:collection/collection.dart';
+
+import 'package:app/map.dart';
 
 class Solution {
   List<String> lines;
@@ -8,7 +10,7 @@ class Solution {
 
   Future<int> solvePart1() async {
     final map = MapGrid.fromLines(lines, emptySymbol: mapSymbols[MapSymbol.emptyTile]!);
-    map.display();
+    map.display(symbolsColorsMap: Map.from({mapSymbols[MapSymbol.start]: AnsiPen()..red(bold: true)}));
 
     final startPosition = map.findSymbolCoordinates(mapSymbols[MapSymbol.start]!).first;
     final halfLoopPaths = getHalfLoopPaths(startPosition, map);
@@ -17,7 +19,7 @@ class Solution {
   }
 
   Future<int> solvePart2() async {
-    final map = MapGrid.fromLines(lines);
+    final map = MapGrid.fromLines(lines, emptySymbol: mapSymbols[MapSymbol.emptyTile]!);
 
     final startPosition = map.findSymbolCoordinates(mapSymbols[MapSymbol.start]!).first;
     final halfLoopPaths = getHalfLoopPaths(startPosition, map);
@@ -26,11 +28,17 @@ class Solution {
     final nbSteps = halfLoopPaths.firstHalf.length - 1; // Ignoring starting node
     final fullLoopPath = [...halfLoopPaths.firstHalf, ...halfLoopPaths.secondHalf.reversed.toList().sublist(1, nbSteps)];
     map.grid.removeWhere((point, symbol) => !fullLoopPath.contains(point));
-    map.display();
 
     // All regions enclosed by pipes
-    final (enclosedRegions, _) = map.getEmptyRegions();
+    final (enclosedRegions, _) = map.findEmptyRegions();
     print('Number of enclosed regions in normal coordinates system: ${enclosedRegions.length}');
+
+    // Printing map with colored start position and enclosed regions
+    final redPen = AnsiPen()..red(bold: true);
+    final bluePen = AnsiPen()..cyan(bold: true);
+    final enclosedColoredPoints = Map.fromEntries(enclosedRegions.flattened.map((point) => MapEntry(point, bluePen)));
+    enclosedColoredPoints.addAll({startPosition: redPen});
+    map.display(coordinatesColorsMap: enclosedColoredPoints);
 
     //==============================================================================================================================
     // Zooming in by doubling coordinates system so we can squeeze through pipes and validate if enclosed region is inside the loop
@@ -43,7 +51,7 @@ class Solution {
     final zoomedInMap = getZoomedInMap(map, emptyPoints: enclosedRegions.flattened.toSet());
     final emptyPoints = zoomedInMap.findSymbolCoordinates(mapSymbols[MapSymbol.emptyTile]!).toSet();
 
-    final (zoomedInRegions, _) = zoomedInMap.getEmptyRegions(emptyCoordinates: emptyPoints);
+    final (zoomedInRegions, _) = zoomedInMap.findEmptyRegions(emptyCoordinates: emptyPoints);
     print('Number of enclosed regions in zoomed in coordinates system: ${zoomedInRegions.length}');
 
     // Removing outer regions (i.e: next to an unmapped value)
@@ -55,7 +63,7 @@ class Solution {
     final enclosedPoints = enclosedLoopRegions.flattened
         .where((coordinate) => coordinate.x % 2 == 0 && coordinate.y % 2 == 0) // Removing added extra space inbetween pipes
         .toList();
-    print('-------');
+    print('-------------------');
 
     return enclosedPoints.length;
   }
