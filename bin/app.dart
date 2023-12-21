@@ -18,6 +18,7 @@ import 'package:app/day08/solution.dart' as day08; // ignore: unused_import
 import 'package:app/day09/solution.dart' as day09; // ignore: unused_import
 import 'package:app/day10/solution.dart' as day10; // ignore: unused_import
 import 'package:app/day11/solution.dart' as day11; // ignore: unused_import
+import 'package:app/day12/solution.dart' as day12; // ignore: unused_import
 
 void main(List<String> arguments) async {
   exitCode = 0; // Presume success
