@@ -54,7 +54,7 @@ void main() {
     test('should find right solution for input', () async {
       final result = await Solution(inputLines).solvePart2();
 
-      expect(result, equals(0));
+      expect(result, equals(4964259839627));
     });
   });
 }

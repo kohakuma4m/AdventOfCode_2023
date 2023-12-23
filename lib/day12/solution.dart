@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:memoized/memoized.dart';
 
 class Solution {
   List<String> lines;
@@ -8,29 +9,37 @@ class Solution {
   Future<int> solvePart1() async {
     final damagedRecords = readDamagedRecords(lines);
 
-    return solve(damagedRecords);
-  }
-
-  Future<int> solvePart2() async {
-    final damagedRecords = readDamagedRecords(lines, unfold: true);
-
-    return solve(damagedRecords);
-  }
-
-  Future<int> solve(List<SpringRecord> damagedRecords) async {
-    final paddingIndex = damagedRecords.length.toString().length;
     final List<List<String>> possibleRecordArrangements = [];
+
+    final paddingIndex = damagedRecords.length.toString().length;
     for (final (idx, springRecord) in damagedRecords.indexed) {
       final arrangements = findPossibleRecordArrangements(springRecord);
 
-      final recordString = '${springRecord.record} ${springRecord.damagedGroups}';
-      print('Record #${(idx + 1).toString().padLeft(paddingIndex)}: ${arrangements.length.toString().padRight(4)} --> $recordString');
+      print('Record #${(idx + 1).toString().padLeft(paddingIndex)}: ${arrangements.length}');
 
       possibleRecordArrangements.add(arrangements);
     }
     print('-------------------');
 
     return possibleRecordArrangements.fold<int>(0, (total, arrangements) => total + arrangements.length);
+  }
+
+  Future<int> solvePart2() async {
+    final damagedRecords = readDamagedRecords(lines, unfold: true);
+
+    final List<int> nbPossibleRecordArrangements = [];
+
+    final paddingIndex = damagedRecords.length.toString().length;
+    for (final (idx, springRecord) in damagedRecords.indexed) {
+      final nbArrangements = findNbPossibleRecordArrangements(springRecord);
+
+      print('Record #${(idx + 1).toString().padLeft(paddingIndex)}: $nbArrangements');
+
+      nbPossibleRecordArrangements.add(nbArrangements);
+    }
+    print('-------------------');
+
+    return nbPossibleRecordArrangements.sum;
   }
 
   ///////////////////////////////////////
@@ -40,116 +49,90 @@ class Solution {
   static List<SpringRecord> readDamagedRecords(List<String> lines, {bool unfold = false}) {
     final springRecords = lines.map((line) {
       final [record, damagedGroups] = line.split(' ');
-      return (record: record, damagedGroups: damagedGroups.split(',').map((g) => int.parse(g)).toList());
+      return SpringRecord(record, damagedGroups.split(',').map((g) => int.parse(g)).toList());
     });
 
     if (!unfold) {
       return springRecords.toList();
     }
 
-    return springRecords.map((item) => (
-      record: List.filled(5, item.record).join(springSymbols[SpringState.unknown]!),
-      damagedGroups: List.filled(5, item.damagedGroups).flattened.toList()
+    return springRecords.map((item) => SpringRecord(
+      List.filled(5, item.record).join(springSymbols[SpringState.unknown]!),
+      List.filled(5, item.groups).flattened.toList()
     )).toList();
   }
 
-  ///=====================================================================================
-  /// Iterative solution without cache
+  ///============================================================================================
+  /// Iterative solution without cache that find all possible arrangements
   ///
-  /// Solve part 1 in about 3 seconds, but cannot even solve example input for part 2...
-  ///=====================================================================================
-  static List<String> findPossibleRecordArrangements(SpringRecord damagedRecord) {
+  /// Part 1: solve input in about 1 second
+  /// Part 2: solve example input in around 10 seconds, but far too slow for real input
+  ///
+  /// Note: Using DFS with List.removeLast() [O(1)] instead of BFS with List.removeAt(0) [O(n)]
+  ///       (with BFS, even example input is far too slow for part 2...)
+  ///============================================================================================
+  static List<String> findPossibleRecordArrangements(SpringRecord springRecord) {
     final List<String> arrangements = [];
 
     // Finding all possible arrangements with a recursive loop
-    final arrangementsToValidate = [(current: damagedRecord.record, startIndex: 0, remainingGroupLengths: damagedRecord.damagedGroups)];
+    final arrangementsToValidate = [(record: springRecord.record, start: 0, groups: springRecord.groups)];
     while (arrangementsToValidate.isNotEmpty) {
-      final (:current, :startIndex, :remainingGroupLengths) = arrangementsToValidate.removeAt(0);
+      final (:record, :start, :groups) = arrangementsToValidate.removeLast();
+      final currentRecord = record.substring(start);
 
-      final remainingSeparateGroups = current.substring(startIndex).split(springSymbols[SpringState.operational]!).where((group) => group.isNotEmpty).toList();
-      if (remainingSeparateGroups.fold(0, (total, group) => total + group.length) < remainingGroupLengths.sum) {
-        // Invalid arrangement (not enough unknown left for all damaged spring)
-        continue;
-      }
-
-      if (remainingGroupLengths.isEmpty || !current.contains(springSymbols[SpringState.unknown]!)) {
-        // No remaining groups to assign or no symbol left to decode...
-        final updatedRecord = current.replaceAll(springSymbols[SpringState.unknown]!, springSymbols[SpringState.operational]!);
-        final separateGroups = updatedRecord.split(springSymbols[SpringState.operational]!).where((group) => group.isNotEmpty).toList();
-        if (
-          separateGroups.length == damagedRecord.damagedGroups.length
-          && separateGroups.indexed.every((element) => element.$2.length == damagedRecord.damagedGroups[element.$1])
-        ) {
-          // Valid arrangement (invalid otherwise)
-          arrangements.add(updatedRecord);
+      if (groups.isEmpty) {
+        // Valid only if there is no remaining unmatched damaged spring...
+        if (!currentRecord.contains(springSymbols[SpringState.damaged]!)) {
+          arrangements.add(record.replaceAll(springSymbols[SpringState.unknown]!, springSymbols[SpringState.operational]!));
         }
+
         continue;
       }
 
-      final groupLengthToMatch = remainingGroupLengths.first;
+      final remainingGroups = currentRecord.split(springSymbols[SpringState.operational]!).where((group) => group.isNotEmpty).toList();
+      if (remainingGroups.fold(0, (total, group) => total + group.length) < groups.sum) {
+        // Invalid since there is not enough space left for all damaged springs
+        continue;
+      }
 
-      searchLoop: // Loop to find first non operational symbol
-      for (var i = startIndex; i < current.length; i++) {
-        switch (getSprintState(current[i])) {
-          case SpringState.operational: {
-            continue; // Skipping
+      // Looking at next character
+      switch (getSprintState(record[start])) {
+        case SpringState.operational: {
+          // Skipping to next group directly
+          final nextGroupStartIndex = start + currentRecord.indexOf(remainingGroups.first);
+          arrangementsToValidate.add((record: record, start: nextGroupStartIndex, groups: groups));
+          continue;
+        }
+        case SpringState.unknown: {
+          // Trying both possibilities in next iterations
+          arrangementsToValidate.addAll([
+            (record: record.replaceRange(start, start + 1, springSymbols[SpringState.damaged]!), start: start, groups: groups),
+            (record: record.replaceRange(start, start + 1, springSymbols[SpringState.operational]!), start: start, groups: groups),
+          ]);
+          continue;
+        }
+        case SpringState.damaged: {
+          final groupLengthToMatch = groups.first;
+          if (remainingGroups.first.length < groupLengthToMatch) {
+            // Not enough space left to fit damaged springs group in record remaining group
+            continue;
           }
-          case SpringState.damaged: {
-            final start = i;
-            final end = i + groupLengthToMatch;
-            if (
-              end > current.length
-              || current.substring(start, end).contains(springSymbols[SpringState.operational]!)
-              || (end < current.length && getSprintState(current[end]) == SpringState.damaged)
-            ) {
-              // Invalid arrangement (not enough space left for damaged group in current separate group)
-              break searchLoop;
-            }
 
-            var match = current[start];
-            while (match.length < groupLengthToMatch) {
-              match += springSymbols[SpringState.damaged]!;
-            }
-            if (end + 1 < current.length) {
-              // Adding delimiter with next group
-              match += springSymbols[SpringState.operational]!;
-
-              if (current[end] == springSymbols[SpringState.unknown] && remainingGroupLengths.length == 1) {
-                // Filling in remaining connected unknowns in current group...
-                while (start + match.length < current.length && current[start + match.length] == springSymbols[SpringState.unknown]) {
-                  match += springSymbols[SpringState.operational]!;
-                }
-              }
-            }
-
-            // Updating record for next iteration
-            var updatedRecord = current.replaceRange(start, start + match.length, match);
-            arrangementsToValidate.add((current: updatedRecord, startIndex: start + match.length, remainingGroupLengths: remainingGroupLengths.slice(1)));
-            break searchLoop;
+          if (start + groupLengthToMatch < record.length && record[start + groupLengthToMatch] == springSymbols[SpringState.damaged]!) {
+            // Can't fit damaged springs group before next damaged springs group
+            continue;
           }
-          case SpringState.unknown: {
-            final start = i;
-            final currentGroupLength = current.substring(start).indexOf(springSymbols[SpringState.operational]!);
-            if (
-              currentGroupLength > 0
-              && currentGroupLength < remainingGroupLengths.first
-              && !current.substring(start, start + currentGroupLength).contains(springSymbols[SpringState.damaged]!)
-            ) {
-              // Not enough room to fit next damaged group of springs
-              final updatedRecord = current.replaceRange(start, start + currentGroupLength, springSymbols[SpringState.operational]! * currentGroupLength);
-              arrangementsToValidate.add((current: updatedRecord, startIndex: start + currentGroupLength, remainingGroupLengths: remainingGroupLengths));
-              break searchLoop;
-            }
 
-            // Trying both possibilities in next iterations
-            final possibleRecord1 = current.replaceRange(i, i + 1, springSymbols[SpringState.damaged]!);
-            final possibleRecord2 = current.replaceRange(i, i + 1, springSymbols[SpringState.operational]!);
-
-            arrangementsToValidate.addAll([
-              (current: possibleRecord1, startIndex: i, remainingGroupLengths: remainingGroupLengths),
-              (current: possibleRecord2, startIndex: i, remainingGroupLengths: remainingGroupLengths),
-            ]);
-            break searchLoop;
+          // Skipping to next damaged group
+          if (start + groupLengthToMatch == record.length) {
+            final updatedRecord = record
+              .replaceRange(start, start + groupLengthToMatch, springSymbols[SpringState.damaged]! * groupLengthToMatch);
+            arrangementsToValidate.add((record: updatedRecord, start: start + groupLengthToMatch, groups: groups.slice(1)));
+          } else {
+            final updatedRecord = record
+              .replaceRange(start, start + groupLengthToMatch, springSymbols[SpringState.damaged]! * groupLengthToMatch)
+              .replaceRange(start + groupLengthToMatch, start + groupLengthToMatch + 1, springSymbols[SpringState.operational]!);
+            arrangementsToValidate.add((record: updatedRecord, start: start + groupLengthToMatch + 1, groups: groups.slice(1)));
           }
         }
       }
@@ -157,13 +140,69 @@ class Solution {
 
     return arrangements;
   }
+
+  ///============================================================================================
+  /// Recursive solution with cache that only find number of possible arrangements
+  ///
+  /// Solve part 1 in about 1 second
+  /// Solve part 2 in about 7 seconds (far too slow without cache...)
+  ///============================================================================================
+  static int findNbPossibleRecordArrangements(SpringRecord springRecord, {int cacheSize = 256}) {
+    // Cache
+    late final Memoized1<int, SpringRecord> findNbPossibleRecordArrangementsWithCache;
+    findNbPossibleRecordArrangementsWithCache = Memoized1((SpringRecord springRecord) {
+      final (record, groups) = (springRecord.record, springRecord.groups);
+
+      if (groups.isEmpty) {
+        // Valid only if there is no remaining unmatched damaged spring...
+        return !record.contains(springSymbols[SpringState.damaged]!) ? 1 : 0;
+      }
+
+      final remainingGroups = record.split(springSymbols[SpringState.operational]!).where((group) => group.isNotEmpty).toList();
+      if (remainingGroups.fold(0, (total, group) => total + group.length) < groups.sum) {
+        // Invalid since there is not enough space left for all damaged springs
+        return 0;
+      }
+
+      // Looking at next character
+      switch (getSprintState(record[0])) {
+        case SpringState.operational: {
+          // Skipping to next group directly
+          final nextGroupStart = record.indexOf(remainingGroups.first);
+          return findNbPossibleRecordArrangementsWithCache(SpringRecord(record.substring(nextGroupStart), groups));
+        }
+        case SpringState.unknown: {
+          // Adding number of arrangements for both possibilities
+          return findNbPossibleRecordArrangementsWithCache(SpringRecord(record.replaceRange(0, 1, springSymbols[SpringState.operational]!), groups))
+            + findNbPossibleRecordArrangementsWithCache(SpringRecord(record.replaceRange(0, 1, springSymbols[SpringState.damaged]!), groups));
+        }
+        case SpringState.damaged: {
+          final groupLengthToMatch = groups.first;
+          if (remainingGroups.first.length < groupLengthToMatch) {
+            // Not enough space left to fit damaged springs group in record remaining group
+            return 0;
+          }
+
+          if (groupLengthToMatch < record.length && record[groupLengthToMatch] == springSymbols[SpringState.damaged]!) {
+            // Can't fit damaged springs group before next damaged springs group
+            return 0;
+          }
+
+          // Skipping to next damaged group
+          return groupLengthToMatch == record.length
+            ? findNbPossibleRecordArrangementsWithCache(SpringRecord(record.substring(groupLengthToMatch), groups.slice(1)))
+            : findNbPossibleRecordArrangementsWithCache(SpringRecord(record.substring(groupLengthToMatch + 1), groups.slice(1)));
+        }
+      }
+    }, capacity: cacheSize);
+
+    return findNbPossibleRecordArrangementsWithCache(springRecord);
+  }
 }
 
 ////////////////////////////////
 /// Custom types & methods
 ////////////////////////////////
-
-typedef SpringRecord = ({String record, List<int> damagedGroups});
 
 enum SpringState { operational, damaged, unknown }
 
@@ -175,5 +214,27 @@ const springSymbols = {
 
 SpringState getSprintState(String symbol) {
   return springSymbols.keys.firstWhere((key) => springSymbols[key] == symbol);
+}
+
+class SpringRecord {
+  String record;
+  List<int> groups;
+
+  SpringRecord(this.record, this.groups);
+
+  @override
+  String toString() {
+    return '$record [${groups.join(',')}]';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SpringRecord
+      && other.record == record
+      && other.groups.join(',') == groups.join(',');
+  }
+
+  @override
+  int get hashCode => toString().hashCode;
 }
 
