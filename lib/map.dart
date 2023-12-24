@@ -234,7 +234,7 @@ class MapGrid {
         }
       }
 
-      print(showBorder ? '|$line|' : line);
+      print(showBorder ? '$borderYSymbol$line$borderYSymbol' : line);
     }
 
     if (showBorder) {

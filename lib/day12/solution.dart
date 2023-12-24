@@ -56,10 +56,9 @@ class Solution {
       return springRecords.toList();
     }
 
-    return springRecords.map((item) => SpringRecord(
-      List.filled(5, item.record).join(springSymbols[SpringState.unknown]!),
-      List.filled(5, item.groups).flattened.toList()
-    )).toList();
+    return springRecords
+        .map((item) => SpringRecord(List.filled(5, item.record).join(springSymbols[SpringState.unknown]!), List.filled(5, item.groups).flattened.toList()))
+        .toList();
   }
 
   ///============================================================================================
@@ -97,44 +96,46 @@ class Solution {
 
       // Looking at next character
       switch (getSprintState(record[start])) {
-        case SpringState.operational: {
-          // Skipping to next group directly
-          final nextGroupStartIndex = start + currentRecord.indexOf(remainingGroups.first);
-          arrangementsToValidate.add((record: record, start: nextGroupStartIndex, groups: groups));
-          continue;
-        }
-        case SpringState.unknown: {
-          // Trying both possibilities in next iterations
-          arrangementsToValidate.addAll([
-            (record: record.replaceRange(start, start + 1, springSymbols[SpringState.damaged]!), start: start, groups: groups),
-            (record: record.replaceRange(start, start + 1, springSymbols[SpringState.operational]!), start: start, groups: groups),
-          ]);
-          continue;
-        }
-        case SpringState.damaged: {
-          final groupLengthToMatch = groups.first;
-          if (remainingGroups.first.length < groupLengthToMatch) {
-            // Not enough space left to fit damaged springs group in record remaining group
+        case SpringState.operational:
+          {
+            // Skipping to next group directly
+            final nextGroupStartIndex = start + currentRecord.indexOf(remainingGroups.first);
+            arrangementsToValidate.add((record: record, start: nextGroupStartIndex, groups: groups));
             continue;
           }
-
-          if (start + groupLengthToMatch < record.length && record[start + groupLengthToMatch] == springSymbols[SpringState.damaged]!) {
-            // Can't fit damaged springs group before next damaged springs group
+        case SpringState.unknown:
+          {
+            // Trying both possibilities in next iterations
+            arrangementsToValidate.addAll([
+              (record: record.replaceRange(start, start + 1, springSymbols[SpringState.damaged]!), start: start, groups: groups),
+              (record: record.replaceRange(start, start + 1, springSymbols[SpringState.operational]!), start: start, groups: groups),
+            ]);
             continue;
           }
+        case SpringState.damaged:
+          {
+            final groupLengthToMatch = groups.first;
+            if (remainingGroups.first.length < groupLengthToMatch) {
+              // Not enough space left to fit damaged springs group in record remaining group
+              continue;
+            }
 
-          // Skipping to next damaged group
-          if (start + groupLengthToMatch == record.length) {
-            final updatedRecord = record
-              .replaceRange(start, start + groupLengthToMatch, springSymbols[SpringState.damaged]! * groupLengthToMatch);
-            arrangementsToValidate.add((record: updatedRecord, start: start + groupLengthToMatch, groups: groups.slice(1)));
-          } else {
-            final updatedRecord = record
-              .replaceRange(start, start + groupLengthToMatch, springSymbols[SpringState.damaged]! * groupLengthToMatch)
-              .replaceRange(start + groupLengthToMatch, start + groupLengthToMatch + 1, springSymbols[SpringState.operational]!);
-            arrangementsToValidate.add((record: updatedRecord, start: start + groupLengthToMatch + 1, groups: groups.slice(1)));
+            if (start + groupLengthToMatch < record.length && record[start + groupLengthToMatch] == springSymbols[SpringState.damaged]!) {
+              // Can't fit damaged springs group before next damaged springs group
+              continue;
+            }
+
+            // Skipping to next damaged group
+            if (start + groupLengthToMatch == record.length) {
+              final updatedRecord = record.replaceRange(start, start + groupLengthToMatch, springSymbols[SpringState.damaged]! * groupLengthToMatch);
+              arrangementsToValidate.add((record: updatedRecord, start: start + groupLengthToMatch, groups: groups.slice(1)));
+            } else {
+              final updatedRecord = record
+                  .replaceRange(start, start + groupLengthToMatch, springSymbols[SpringState.damaged]! * groupLengthToMatch)
+                  .replaceRange(start + groupLengthToMatch, start + groupLengthToMatch + 1, springSymbols[SpringState.operational]!);
+              arrangementsToValidate.add((record: updatedRecord, start: start + groupLengthToMatch + 1, groups: groups.slice(1)));
+            }
           }
-        }
       }
     }
 
@@ -166,33 +167,36 @@ class Solution {
 
       // Looking at next character
       switch (getSprintState(record[0])) {
-        case SpringState.operational: {
-          // Skipping to next group directly
-          final nextGroupStart = record.indexOf(remainingGroups.first);
-          return findNbPossibleRecordArrangementsWithCache(SpringRecord(record.substring(nextGroupStart), groups));
-        }
-        case SpringState.unknown: {
-          // Adding number of arrangements for both possibilities
-          return findNbPossibleRecordArrangementsWithCache(SpringRecord(record.replaceRange(0, 1, springSymbols[SpringState.operational]!), groups))
-            + findNbPossibleRecordArrangementsWithCache(SpringRecord(record.replaceRange(0, 1, springSymbols[SpringState.damaged]!), groups));
-        }
-        case SpringState.damaged: {
-          final groupLengthToMatch = groups.first;
-          if (remainingGroups.first.length < groupLengthToMatch) {
-            // Not enough space left to fit damaged springs group in record remaining group
-            return 0;
+        case SpringState.operational:
+          {
+            // Skipping to next group directly
+            final nextGroupStart = record.indexOf(remainingGroups.first);
+            return findNbPossibleRecordArrangementsWithCache(SpringRecord(record.substring(nextGroupStart), groups));
           }
-
-          if (groupLengthToMatch < record.length && record[groupLengthToMatch] == springSymbols[SpringState.damaged]!) {
-            // Can't fit damaged springs group before next damaged springs group
-            return 0;
+        case SpringState.unknown:
+          {
+            // Adding number of arrangements for both possibilities
+            return findNbPossibleRecordArrangementsWithCache(SpringRecord(record.replaceRange(0, 1, springSymbols[SpringState.operational]!), groups)) +
+                findNbPossibleRecordArrangementsWithCache(SpringRecord(record.replaceRange(0, 1, springSymbols[SpringState.damaged]!), groups));
           }
+        case SpringState.damaged:
+          {
+            final groupLengthToMatch = groups.first;
+            if (remainingGroups.first.length < groupLengthToMatch) {
+              // Not enough space left to fit damaged springs group in record remaining group
+              return 0;
+            }
 
-          // Skipping to next damaged group
-          return groupLengthToMatch == record.length
-            ? findNbPossibleRecordArrangementsWithCache(SpringRecord(record.substring(groupLengthToMatch), groups.slice(1)))
-            : findNbPossibleRecordArrangementsWithCache(SpringRecord(record.substring(groupLengthToMatch + 1), groups.slice(1)));
-        }
+            if (groupLengthToMatch < record.length && record[groupLengthToMatch] == springSymbols[SpringState.damaged]!) {
+              // Can't fit damaged springs group before next damaged springs group
+              return 0;
+            }
+
+            // Skipping to next damaged group
+            return groupLengthToMatch == record.length
+                ? findNbPossibleRecordArrangementsWithCache(SpringRecord(record.substring(groupLengthToMatch), groups.slice(1)))
+                : findNbPossibleRecordArrangementsWithCache(SpringRecord(record.substring(groupLengthToMatch + 1), groups.slice(1)));
+          }
       }
     }, capacity: cacheSize);
 
@@ -206,11 +210,7 @@ class Solution {
 
 enum SpringState { operational, damaged, unknown }
 
-const springSymbols = {
-  SpringState.operational: '.',
-  SpringState.damaged: '#',
-  SpringState.unknown: '?'
-};
+const springSymbols = {SpringState.operational: '.', SpringState.damaged: '#', SpringState.unknown: '?'};
 
 SpringState getSprintState(String symbol) {
   return springSymbols.keys.firstWhere((key) => springSymbols[key] == symbol);
@@ -229,12 +229,9 @@ class SpringRecord {
 
   @override
   bool operator ==(Object other) {
-    return other is SpringRecord
-      && other.record == record
-      && other.groups.join(',') == groups.join(',');
+    return other is SpringRecord && other.record == record && other.groups.join(',') == groups.join(',');
   }
 
   @override
   int get hashCode => toString().hashCode;
 }
-

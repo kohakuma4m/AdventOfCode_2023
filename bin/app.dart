@@ -6,7 +6,7 @@ import 'package:collection/collection.dart';
 
 import 'package:app/file.dart';
 
-// Importing solutions (TODO: import dynamically at runtime ???)
+// Importing solutions
 import 'package:app/day01/solution.dart' as day01; // ignore: unused_import
 import 'package:app/day02/solution.dart' as day02; // ignore: unused_import
 import 'package:app/day03/solution.dart' as day03; // ignore: unused_import
@@ -19,6 +19,7 @@ import 'package:app/day09/solution.dart' as day09; // ignore: unused_import
 import 'package:app/day10/solution.dart' as day10; // ignore: unused_import
 import 'package:app/day11/solution.dart' as day11; // ignore: unused_import
 import 'package:app/day12/solution.dart' as day12; // ignore: unused_import
+import 'package:app/day13/solution.dart' as day12; // ignore: unused_import
 
 void main(List<String> arguments) async {
   exitCode = 0; // Presume success
