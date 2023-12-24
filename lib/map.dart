@@ -176,6 +176,14 @@ Point getAdjacentDirectionCoordinate(Point p, Direction direction) {
   }
 }
 
+/// Sort direction clockwise starting from up
+int compareDirection(Direction d1, Direction d2) {
+  final index1 = Direction.values.indexOf(d1);
+  final index2 = Direction.values.indexOf(d2);
+
+  return index1 - index2;
+}
+
 /// 2D region
 typedef Region = Set<Point>;
 
