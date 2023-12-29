@@ -20,7 +20,7 @@ class Solution {
     final map = MapGrid.fromLines(lines);
 
     // Generating all possible starting beams
-    final List<LightBeam> startingBeams = [];
+    final List<Step> startingBeams = [];
     for (var x = 0; x < map.width; x++) {
       startingBeams.addAll([
         (coordinate: Point(x, 0), direction: Direction.down),
@@ -48,7 +48,7 @@ class Solution {
       }
     }
 
-    displayEnergizedTiles(map, bestConfiguration.energizedTiles);
+    displayEnergizedTiles(map, bestConfiguration.energizedTiles, startingBeam: bestConfiguration.startingBeam);
 
     final (:coordinate, :direction) = bestConfiguration.startingBeam;
     print('Optimal beam ${coordinate.toString().padRight(10)} --> ${direction.name.padRight(5)}');
@@ -61,11 +61,14 @@ class Solution {
   /// Static methods
   ///////////////////////////////////////
 
-  static Set<Point> getEnergizedTiles(MapGrid map, {LightBeam startingBeam = (coordinate: const Point(0, 0), direction: Direction.right)}) {
+  ///============================================================================================
+  /// Iterative DFS solution
+  ///============================================================================================
+  static Set<Point> getEnergizedTiles(MapGrid map, {Step startingBeam = (coordinate: const Point(0, 0), direction: Direction.right)}) {
     final Set<Point> energizedTiles = {};
 
-    final Set<LightBeam> visitedLightBeams = {};
-    final List<LightBeam> lightsBeamsToProcess = [startingBeam];
+    final Set<Step> visitedLightBeams = {};
+    final List<Step> lightsBeamsToProcess = [startingBeam];
     while (lightsBeamsToProcess.isNotEmpty) {
       final lightPath = lightsBeamsToProcess.removeLast();
       final (:coordinate, :direction) = lightPath;
@@ -151,18 +154,29 @@ class Solution {
     return energizedTiles;
   }
 
-  static displayEnergizedTiles(MapGrid map, Set<Point> energizedTiles) {
-    final newEntries = energizedTiles.map((point) => MapEntry(point, mapSymbols[MapSymbol.energizedTile]!)).toList();
-    final energizedTilesMap = MapGrid(map.width, map.height, Map.fromEntries(newEntries));
-    energizedTilesMap.display(symbolsColorsMap: mapColors);
+  static displayEnergizedTiles(MapGrid map, Set<Point> energizedTiles, {Step? startingBeam}) {
+    final Map<Point, AnsiPen> coordinateColors = {};
+    final energizedTilesMap = MapGrid(map.width, map.height, Map.fromEntries(map.grid.entries));
+
+    for (final tile in energizedTiles) {
+      energizedTilesMap.grid.update(tile, (value) {
+        return getMapSymbol(value) == MapSymbol.emptySpace ? mapSymbols[MapSymbol.energizedTile]! : value;
+      });
+      coordinateColors.addAll({tile: mapColors[mapSymbols[MapSymbol.energizedTile]]!});
+    }
+
+    if (startingBeam != null) {
+      energizedTilesMap.grid.update(startingBeam.coordinate, (_) => directionSymbols[startingBeam.direction]!);
+      coordinateColors.addAll({startingBeam.coordinate: startColor});
+    }
+
+    energizedTilesMap.display(symbolsColorsMap: mapColors, coordinatesColorsMap: coordinateColors);
   }
 }
 
 ////////////////////////////////
 /// Custom types & methods
 ////////////////////////////////
-
-typedef LightBeam = ({Point coordinate, Direction direction});
 
 enum MapSymbol { emptySpace, rightMirror, leftMirror, verticalSplitter, horizontalSplitter, energizedTile }
 
@@ -195,3 +209,5 @@ final mapColors = {
   mapSymbols[MapSymbol.horizontalSplitter]!: AnsiPen()..white(bold: true),
   mapSymbols[MapSymbol.energizedTile]!: AnsiPen()..yellow(bold: true)
 };
+
+final startColor = AnsiPen()..red(bold: true);

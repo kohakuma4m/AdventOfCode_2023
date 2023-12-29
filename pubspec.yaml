@@ -13,6 +13,7 @@ dependencies:
   collection: ^1.18.0
   dart_numerics: ^0.0.6
   memoized: ^2.2.1
+  progress_bar: ^1.0.0
   qbcps_flutter: ^1.0.0
   trotter: ^2.2.0
   # path: ^1.8.0

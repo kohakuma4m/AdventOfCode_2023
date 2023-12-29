@@ -111,6 +111,13 @@ int calculateDistanceBetweenPoints(Point p1, Point p2) {
 /// 2D Directions
 enum Direction { up, upRight, right, downRight, down, downLeft, left, upLeft }
 
+const directionSymbols = {
+  Direction.up: '^',
+  Direction.right: '>',
+  Direction.down: 'v',
+  Direction.left: '<',
+};
+
 /// Get adjacent coordinates
 List<Point> getAdjacentCoordinates(Point p, {bool cardinalDirections = true, bool diagonalDirections = true}) {
   final List<Point> points = [];
@@ -176,6 +183,44 @@ Point getAdjacentDirectionCoordinate(Point p, Direction direction) {
   }
 }
 
+/// Get opposite direction
+Direction getOppositeDirection(Direction direction) {
+  switch (direction) {
+    case Direction.up:
+      {
+        return Direction.down;
+      }
+    case Direction.upRight:
+      {
+        return Direction.downLeft;
+      }
+    case Direction.right:
+      {
+        return Direction.left;
+      }
+    case Direction.downRight:
+      {
+        return Direction.upLeft;
+      }
+    case Direction.down:
+      {
+        return Direction.up;
+      }
+    case Direction.downLeft:
+      {
+        return Direction.upRight;
+      }
+    case Direction.left:
+      {
+        return Direction.right;
+      }
+    case Direction.upLeft:
+      {
+        return Direction.downRight;
+      }
+  }
+}
+
 /// Sort direction clockwise starting from up
 int compareDirection(Direction d1, Direction d2) {
   final index1 = Direction.values.indexOf(d1);
@@ -183,6 +228,10 @@ int compareDirection(Direction d1, Direction d2) {
 
   return index1 - index2;
 }
+
+/// 2D path
+typedef Step = ({Point coordinate, Direction direction});
+typedef Path = List<Step>;
 
 /// 2D region
 typedef Region = Set<Point>;
@@ -248,6 +297,46 @@ class MapGrid {
     if (showBorder) {
       print(separatorLine);
     }
+  }
+
+  void displayPath(Path path,
+      {bool showBorder = true,
+      String emptySymbol = '.',
+      String borderXSymbol = '-',
+      String borderYSymbol = '|',
+      AnsiPen? pathColor,
+      AnsiPen? startColor,
+      AnsiPen? endColor,
+      bool overlay = false}) {
+    final stepColor = pathColor ?? (AnsiPen()..blue(bold: true));
+    final symbolColors = {
+      directionSymbols[Direction.up]!: stepColor,
+      directionSymbols[Direction.right]!: stepColor,
+      directionSymbols[Direction.down]!: stepColor,
+      directionSymbols[Direction.left]!: stepColor,
+    };
+
+    final coordinateColors = {
+      path.first.coordinate: startColor ?? (AnsiPen()..green(bold: true)),
+      path.last.coordinate: endColor ?? (AnsiPen()..red(bold: true))
+    };
+
+    final newMap = MapGrid(width, height, Map.fromEntries(grid.entries));
+    for (final step in path) {
+      if (overlay) {
+        coordinateColors.addAll({step.coordinate: stepColor});
+      } else {
+        newMap.grid[step.coordinate] = directionSymbols[step.direction]!;
+      }
+    }
+
+    newMap.display(
+        showBorder: showBorder,
+        emptySymbol: emptySymbol,
+        borderXSymbol: borderXSymbol,
+        borderYSymbol: borderYSymbol,
+        symbolsColorsMap: symbolColors,
+        coordinatesColorsMap: coordinateColors);
   }
 
   /// Check if coordinate is within map

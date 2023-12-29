@@ -225,6 +225,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.1"
+  progress_bar:
+    dependency: "direct main"
+    description:
+      name: progress_bar
+      sha256: "1785687354138906ead574c231c46f289079a1525121fb1677bdf1600cc41a50"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   pub_semver:
     dependency: transitive
     description:
