@@ -146,7 +146,7 @@ class Solution {
           }
         default:
           {
-            // No other cases
+            throw 'Uncovered case ! $currentTile --> $direction';
           }
       }
     }
@@ -166,7 +166,7 @@ class Solution {
     }
 
     if (startingBeam != null) {
-      energizedTilesMap.grid.update(startingBeam.coordinate, (_) => directionSymbols[startingBeam.direction]!);
+      energizedTilesMap.grid.update(startingBeam.coordinate, (_) => pathDirectionSymbols[startingBeam.direction]!);
       coordinateColors.addAll({startingBeam.coordinate: startColor});
     }
 

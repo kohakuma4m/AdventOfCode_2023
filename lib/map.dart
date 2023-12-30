@@ -111,13 +111,6 @@ int calculateDistanceBetweenPoints(Point p1, Point p2) {
 /// 2D Directions
 enum Direction { up, upRight, right, downRight, down, downLeft, left, upLeft }
 
-const directionSymbols = {
-  Direction.up: '^',
-  Direction.right: '>',
-  Direction.down: 'v',
-  Direction.left: '<',
-};
-
 /// Get adjacent coordinates
 List<Point> getAdjacentCoordinates(Point p, {bool cardinalDirections = true, bool diagonalDirections = true}) {
   final List<Point> points = [];
@@ -146,39 +139,39 @@ List<Point> getAdjacentCoordinates(Point p, {bool cardinalDirections = true, boo
 }
 
 /// Get adjacent coordinate in direction
-Point getAdjacentDirectionCoordinate(Point p, Direction direction) {
+Point getAdjacentDirectionCoordinate(Point p, Direction direction, {int distance = 1}) {
   switch (direction) {
     case Direction.up:
       {
-        return Point(p.x, p.y - 1);
+        return Point(p.x, p.y - distance);
       }
     case Direction.upRight:
       {
-        return Point(p.x + 1, p.y - 1);
+        return Point(p.x + distance, p.y - distance);
       }
     case Direction.right:
       {
-        return Point(p.x + 1, p.y);
+        return Point(p.x + distance, p.y);
       }
     case Direction.downRight:
       {
-        return Point(p.x + 1, p.y + 1);
+        return Point(p.x + distance, p.y + distance);
       }
     case Direction.down:
       {
-        return Point(p.x, p.y + 1);
+        return Point(p.x, p.y + distance);
       }
     case Direction.downLeft:
       {
-        return Point(p.x - 1, p.y + 1);
+        return Point(p.x - distance, p.y + distance);
       }
     case Direction.left:
       {
-        return Point(p.x - 1, p.y);
+        return Point(p.x - distance, p.y);
       }
     case Direction.upLeft:
       {
-        return Point(p.x - 1, p.y - 1);
+        return Point(p.x - distance, p.y - distance);
       }
   }
 }
@@ -232,6 +225,13 @@ int compareDirection(Direction d1, Direction d2) {
 /// 2D path
 typedef Step = ({Point coordinate, Direction direction});
 typedef Path = List<Step>;
+
+const pathDirectionSymbols = {
+  Direction.up: '^',
+  Direction.right: '>',
+  Direction.down: 'v',
+  Direction.left: '<',
+};
 
 /// 2D region
 typedef Region = Set<Point>;
@@ -310,12 +310,13 @@ class MapGrid {
       bool overlay = false}) {
     final stepColor = pathColor ?? (AnsiPen()..blue(bold: true));
     final symbolColors = {
-      directionSymbols[Direction.up]!: stepColor,
-      directionSymbols[Direction.right]!: stepColor,
-      directionSymbols[Direction.down]!: stepColor,
-      directionSymbols[Direction.left]!: stepColor,
+      pathDirectionSymbols[Direction.up]!: stepColor,
+      pathDirectionSymbols[Direction.right]!: stepColor,
+      pathDirectionSymbols[Direction.down]!: stepColor,
+      pathDirectionSymbols[Direction.left]!: stepColor,
     };
 
+    // Mapping path ends colors...
     final coordinateColors = {
       path.first.coordinate: startColor ?? (AnsiPen()..green(bold: true)),
       path.last.coordinate: endColor ?? (AnsiPen()..red(bold: true))
@@ -324,9 +325,11 @@ class MapGrid {
     final newMap = MapGrid(width, height, Map.fromEntries(grid.entries));
     for (final step in path) {
       if (overlay) {
+        // Mapping path as a colored overlay only
         coordinateColors.addAll({step.coordinate: stepColor});
       } else {
-        newMap.grid[step.coordinate] = directionSymbols[step.direction]!;
+        // Mapping path directly into map
+        newMap.grid[step.coordinate] = pathDirectionSymbols[step.direction]!;
       }
     }
 
@@ -379,12 +382,14 @@ class MapGrid {
   /// Parameters:
   /// emptySymbols (optional): list of symbols considered empty in addition to unmapped coordinates
   /// emptyCoordinates (optional): list of coordinates to validate (instead of all coordinates for empty symbols)
-  (List<Region>, List<Region>) findEmptyRegions({Set<String> emptySymbols = const {}, Set<Point>? emptyCoordinates}) {
+  /// mapOtherEmptyCoordinates (optional)
+  (List<Region>, List<Region>) findEmptyRegions(
+      {Set<String> emptySymbols = const {}, Set<Point> emptyCoordinates = const {}, bool includeUnmappedRegionCoordinates = false}) {
     final unmappedTiles = findSymbolCoordinates('', includeEmptyCoordinates: true);
     final emptyTiles = emptySymbols.map((symbol) => findSymbolCoordinates(symbol)).flattened.toSet();
     emptyTiles.addAll(unmappedTiles);
 
-    final tiles = emptyCoordinates ?? emptyTiles;
+    final tiles = emptyCoordinates.isNotEmpty ? emptyCoordinates : emptyTiles;
     final edgeTiles = emptyTiles.where((coordinate) {
       return (coordinate.x == 0 || coordinate.x == width - 1 || coordinate.y == 0 || coordinate.y == height - 1);
     }).toSet();
@@ -395,19 +400,19 @@ class MapGrid {
       tiles.remove(currentTile);
 
       final Region newRegion = {currentTile};
-      bool isRegionCompleted = false;
-      while (!isRegionCompleted) {
-        final initialRegionSize = newRegion.length;
+      final Set<Point> visitedTiles = {};
+      while (visitedTiles.length != newRegion.length) {
+        // Visiting all edge tiles until all region is mapped
+        for (final regionTile in newRegion.difference(visitedTiles)) {
+          visitedTiles.add(regionTile);
 
-        for (final regionTile in newRegion.toList()) {
-          final adjacentTiles = getAdjacentCoordinates(regionTile).where((point) => tiles.contains(point)).toList();
+          final adjacentTiles = getAdjacentCoordinates(regionTile)
+              .where((point) => isCoordinateWithinMap(point))
+              .where((point) => tiles.contains(point) || (includeUnmappedRegionCoordinates && emptyTiles.contains(point) && !newRegion.contains(point)))
+              .toList();
 
           tiles.removeAll(adjacentTiles);
           newRegion.addAll(adjacentTiles);
-        }
-
-        if (newRegion.length == initialRegionSize) {
-          isRegionCompleted = true;
         }
       }
 
