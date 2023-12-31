@@ -101,7 +101,7 @@ final mapColors = {
   mapSymbols[MapSymbol.trench]!: AnsiPen()..cyan(bold: true),
 };
 
-final RegExp _digInstructionRegex = RegExp(r'(?<direction>U|R|D|L) (?<nb_steps>\d+) \((?<trench_hex_color>.+)\)');
+final RegExp digInstructionRegex = RegExp(r'(?<direction>U|R|D|L) (?<nb_steps>\d+) \((?<trench_hex_color>.+)\)');
 const Map<dynamic, Direction> directionsMap = {
   'U': Direction.up,
   'R': Direction.right,
@@ -117,7 +117,7 @@ typedef DigInstruction = (Direction, int);
 
 List<DigInstruction> readDigInstructions(List<String> lines, {bool colorSwap = false}) {
   return lines.map((line) {
-    final match = _digInstructionRegex.allMatches(line).first;
+    final match = digInstructionRegex.allMatches(line).first;
     final trenchColor = match.namedGroup('trench_hex_color')!;
 
     final direction = directionsMap[colorSwap ? trenchColor[trenchColor.length - 1] : match.namedGroup('direction')]!;
