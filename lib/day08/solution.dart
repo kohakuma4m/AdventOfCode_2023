@@ -71,7 +71,7 @@ class Solution {
     final lastPeriods = pathsIntervals.map((intervals) => intervals.last.$1 - intervals[intervals.length - 2].$1).toList();
     final nbEndingNodes = pathsIntervals.map((intervals) => intervals.sublist(1).map((interval) => interval.$2).toSet().length);
     if (lastPeriods.indexed.any((item) => item.$2 != firstPeriods[item.$1]) || nbEndingNodes.any((n) => n > 2)) {
-      throw 'No cyclic pattern !';
+      throw AssertionError('No cyclic pattern !');
     }
     final periods = lastPeriods.sorted((a, b) => a - b);
 

@@ -2,10 +2,11 @@
 Advent of Code 2023 solutions (dart 3.2.2-1)
 
 # To run specific day solution, use
-  - `dart run app -d XX [-p YY] [inputFilename]`
+  - `dart run [--enable-asserts] app -d XX [-p YY] [inputFilename]`
     - `XX` is the day number from 1 to 25
     - `YY` is the optional part number (1 or 2). If missing, both part will be executed
     - `inputFilename` is the optional input text file to use in `lib/dayXX/` solution folder (default is `input.txt`)
+    - `--enable-asserts` should be use only to enable assert statements for debugging
 
 # To run linter, format code, or run static code analysis, use
   - `dart fix [--dry-run|--apply]`

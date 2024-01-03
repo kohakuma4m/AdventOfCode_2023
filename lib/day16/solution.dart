@@ -146,7 +146,7 @@ class Solution {
           }
         default:
           {
-            throw 'Uncovered case ! $currentTile --> $direction';
+            throw Exception('Uncovered case ! $currentTile --> $direction');
           }
       }
     }

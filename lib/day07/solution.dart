@@ -214,7 +214,7 @@ CamelCardHandType getCamelCardHandTypeWithRegex(Hand hand, {bool jokerRule = fal
       }
     default:
       {
-        throw 'Missing uncovered case ! $hand (#J = $nbJokers)';
+        throw Exception('Missing uncovered case ! $hand (#J = $nbJokers)');
       }
   }
 }
@@ -272,7 +272,7 @@ CamelCardHandType getCamelCardHandTypeWithoutRegex(Hand hand, {bool jokerRule = 
       }
     default:
       {
-        throw 'Missing uncovered case ! $hand (#J = $nbJokers)';
+        throw Exception('Missing uncovered case ! $hand (#J = $nbJokers)');
       }
   }
 }

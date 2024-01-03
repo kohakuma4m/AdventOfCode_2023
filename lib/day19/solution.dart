@@ -202,7 +202,7 @@ class Workflow {
       }
     }
 
-    throw 'Part did not match any steps: $this --> $part';
+    throw AssertionError('Part did not match any steps: $this --> $part');
   }
 
   List<(PartRange, String)> validatePartRange(PartRange partRange) {

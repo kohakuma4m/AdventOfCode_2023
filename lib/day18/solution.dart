@@ -190,7 +190,7 @@ class DigPlanMap extends MapGrid {
         }
       default:
         {
-          throw 'Uncovered case ! $adjacentDirections';
+          throw Exception('Uncovered case ! $adjacentDirections');
         }
     }
 
